@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+files:
+  - source: content/
+    destination: /var/@project.artifactId@
+hooks:
+  BeforeInstall:
+    - location: scripts/installDependencies.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: scripts/afterInstall.sh
+      timeout: 30
+      runas: root
+  ApplicationStart:
+    - location: scripts/applicationStart.sh
+      timeout: 60
+      runas: root
+  ApplicationStop:
+    - location: scripts/applicationStop.sh
+      timeout: 60
+      runas: root

@@ -1,0 +1,9 @@
+FROM isuper/java-oracle:jre_latest
+
+ADD qonceptual-springboot-microservice.jar /opt/springboot-microservice-seed/
+ADD newrelic-agent.jar /opt/springboot-microservice-seed/
+ADD newrelic.yml /opt/springboot-microservice-seed/
+
+EXPOSE 8080
+WORKDIR /opt/springboot-microservice-seed/
+CMD ["java", "-Xms512m", "-Xmx1g", "-javaagent:newrelic-agent.jar", "-Dspring.profiles.active=production", "-jar", "springboot-microservice-seed.jar"]

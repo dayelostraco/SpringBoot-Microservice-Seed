@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.dayelostraco</groupId>
+    <artifactId>springboot-microservice-seed</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>SpringBoot Microservice Seed</name>
+    <description>Base Spring Boot Project using Hibernate 5, SpringData, SonarQube and HikariCP</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.2.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <newrelic.version>3.37.0</newrelic.version>
+        <springfox.swagger.version>2.6.1</springfox.swagger.version>
+        <maven.enforcer.plugin>1.4.1</maven.enforcer.plugin>
+        <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
+        <maven.sonar.plugin.version>3.2</maven.sonar.plugin.version>
+        <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
+        <maven.antrun.plugin.version>1.7</maven.antrun.plugin.version>
+        <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+        <maven.compiler.plugin.source.version>1.8</maven.compiler.plugin.source.version>
+        <maven.compiler.plugin.target.version>1.8</maven.compiler.plugin.target.version>
+        <maven.exec.plugin.version>1.5.0</maven.exec.plugin.version>
+        <maven.version.range>[3.1.0, 3.3.9]</maven.version.range>
+        <java.version.range>[1.8.0-101,1.8.0-121]</java.version.range>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>local</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>environment</name>
+                    <value>development</value>
+                </property>
+            </activation>
+            <properties>
+                <spring.profiles.active>development</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>environment</name>
+                    <value>production</value>
+                </property>
+            </activation>
+            <properties>
+                <spring.profiles.active>production</spring.profiles.active>
+            </properties>
+            <build>
+                <defaultGoal>site</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${maven.exec.plugin.version}</version>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>clean</argument>
+                                <argument>package</argument>
+                                <argument>javadoc:aggregate</argument>
+                                <argument>javadoc:test-aggregate</argument>
+                                <argument>sonar:sonar</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+
+        <!-- Spring Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Other Dependencies -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox.swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox.swagger.version}</version>
+        </dependency>
+
+        <!-- Java Agents -->
+        <dependency>
+            <groupId>com.newrelic.agent.java</groupId>
+            <artifactId>newrelic-agent</artifactId>
+            <version>${newrelic.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- Plugins -->
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+            <!-- Compiler Settings -->
+            <plugin>
+                <version>${maven.compiler.plugin.version}</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.plugin.source.version}</source>
+                    <target>${maven.compiler.plugin.target.version}</target>
+                </configuration>
+            </plugin>
+            <!-- Spring Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+            <!-- Maven Enforcer -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven.enforcer.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-banned-dependencies</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>true</searchTransitive>
+                                    <excludes>
+                                        <exclude>javassist:javassist</exclude>
+                                        <exclude>commons-logging</exclude>
+                                        <exclude>aspectj:aspectj*</exclude>
+                                        <exclude>log4j:log4j</exclude>
+                                        <exclude>org.slf4j:1.5*</exclude>
+                                        <exclude>org.springframework:2.*</exclude>
+                                        <exclude>org.springframework:3.0.*</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                                <requireMavenVersion>
+                                    <version>${maven.version.range}</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>${java.version.range}</version>
+                                </requireJavaVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Sonar -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${maven.sonar.plugin.version}</version>
+            </plugin>
+            <!-- JavaDoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <failOnError>false</failOnError>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+            </plugin>
+            <!-- New Relic -->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Docker Build -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>codedeploy-copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/codedeploy</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/codedeploy</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/docker</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Config File Copy -->
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <!-- Copy .ebextensions folder and copy Spring Boot app jar with a generic app name -->
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>${basedir}/.ebextensions</sourceFile>
+                            <destinationFile>${basedir}/target/.ebextensions</destinationFile>
+                            <fileSets>
+                                <fileSet>
+                                    <sourceFile>${basedir}/.ebextensions/01-docker-client.config</sourceFile>
+                                    <destinationFile>${basedir}/target/.ebextensions/01-docker-client.config
+                                    </destinationFile>
+                                </fileSet>
+                                <fileSet>
+                                    <sourceFile>${basedir}/target/${project.artifactId}-${project.version}.jar
+                                    </sourceFile>
+                                    <destinationFile>${basedir}/target/${project.artifactId}.jar</destinationFile>
+                                </fileSet>
+                                <fileSet>
+                                    <sourceFile>${basedir}/target/lib/newrelic-agent-${newrelic.version}.jar
+                                    </sourceFile>
+                                    <destinationFile>${basedir}/target/newrelic-agent.jar</destinationFile>
+                                </fileSet>
+                                <fileSet>
+                                    <sourceFile>${basedir}/src/main/resources/newrelic/newrelic.yml</sourceFile>
+                                    <destinationFile>${basedir}/target/newrelic.yml</destinationFile>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>codedeploy-rename-conf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>rename</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>${project.build.directory}/codedeploy/content/project.conf</sourceFile>
+                            <destinationFile>${project.build.directory}/codedeploy/content/${project.artifactId}.conf</destinationFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>codedeploy-copy-executable</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>${project.build.directory}/${project.build.finalName}.jar</sourceFile>
+                            <destinationFile>${project.build.directory}/codedeploy/content/${project.artifactId}.jar</destinationFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>codedeploy-copy-dockerfile</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>${project.build.directory}/Dockerfile-${spring.profiles.active}</sourceFile>
+                            <destinationFile>${project.build.directory}/Dockerfile</destinationFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Docker ZIP Build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven.antrun.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>zip-files</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <zip destfile="${basedir}/target/${project.artifactId}.zip" basedir="${basedir}/target"
+                                     includes="Dockerfile, .ebextensions/*, newrelic-agent.jar, newrelic.yml, ${project.artifactId}.jar"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
