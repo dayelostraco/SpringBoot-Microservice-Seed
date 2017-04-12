@@ -16,10 +16,11 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 @RestController
-@Api(value = "/heartBeat", description = "Heartbeat Controller API.")
+@RequestMapping("api/v1/health")
+@Api(value = "api/v1/health", description = "Heartbeat Controller API.")
 public class HeartBeatController {
 
-    @RequestMapping("/sample")
+    @RequestMapping("")
     @ResponseBody
     @ApiOperation(value = "Server HeartBeat.",
             httpMethod = "GET", response = HeartBeat.class, nickname = "heartBeat")
